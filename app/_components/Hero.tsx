@@ -59,7 +59,7 @@ export function Hero() {
                 maxWidth: "16ch",
               }}
             >
-              Every parcel.{" "}
+              {/* Every parcel.{" "} */}
               <span className="text-ink-muted font-normal">Every carrier.</span>
               <br />
               One tracking page.
