@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FFFFFF;
+  --foreground: #0A0A0F;
+  --brand: #F97316;
+  --brand-strong: #EA580C;
+  --brand-soft: #FFF1E6;
+  --canvas: #FFFFFF;
+  --surface: #FAFAF9;
+  --ink: #0A0A0F;
+  --ink-muted: #57534E;
+  --ink-faint: #A8A29E;
+  --border: rgba(10, 10, 15, 0.08);
+  --border-strong: rgba(10, 10, 15, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-border-subtle: var(--border);
+  --color-border-strong: var(--border-strong);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.35; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+
+@keyframes dash {
+  to { stroke-dashoffset: -20; }
+}
+
+@keyframes ring-pulse {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.55; }
+  100% { transform: translate(-50%, -50%) scale(2);   opacity: 0;    }
+}
+
+@keyframes row-pulse {
+  0%   { background-color: transparent; }
+  40%  { background-color: rgba(249, 115, 22, 0.08); }
+  100% { background-color: transparent; }
+}
+
+@keyframes draw-line {
+  from { stroke-dashoffset: 420; }
+  to   { stroke-dashoffset: 0;   }
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scalein {
+  from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 7s ease-in-out infinite; animation-delay: 1s; }
+.animate-float-slow { animation: float 8s ease-in-out infinite; animation-delay: 0.5s; }
+.animate-pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+.animate-marquee { animation: marquee 80s linear infinite; }
+.animate-marquee-reverse { animation: marquee 70s linear infinite reverse; }
+.animate-dash { animation: dash 1.2s linear infinite; }
+
+/* One-shot reveal animations — only play when an ancestor stagger container
+   becomes visible (.reveal-in is added by the IntersectionObserver). */
+.reveal-once-ring  { opacity: 0; }
+.reveal-once-row   { background-color: transparent; }
+.reveal-once-line  { stroke-dasharray: 420; stroke-dashoffset: 420; }
+
+[data-stagger].reveal-in .reveal-once-ring {
+  animation: ring-pulse 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[data-stagger].reveal-in .reveal-once-row {
+  animation: row-pulse 1.4s ease-out forwards;
+}
+[data-stagger].reveal-in .reveal-once-line {
+  animation: draw-line 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Premium reveal: fade + lift + subtle scale + de-blur.
+   Easing is ease-out-expo for that "settles into place" feel. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0) scale(0.985);
+  filter: blur(10px);
+  transition:
+    opacity 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1100ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform, filter;
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+/* Variants */
+.reveal--fade { transform: none; }
+.reveal--fade.reveal-in { transform: none; }
+
+.reveal--up-sm { transform: translate3d(0, 16px, 0); filter: blur(6px); }
+.reveal--up-sm.reveal-in { transform: translate3d(0, 0, 0); filter: blur(0); }
+
+.reveal--scale { transform: scale(0.94); filter: blur(8px); }
+.reveal--scale.reveal-in { transform: scale(1); filter: blur(0); }
+
+/* Stagger: children of [data-stagger] animate sequentially.
+   Each direct child gets a delay = index * --stagger-step. */
+[data-stagger] > * {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+  filter: blur(8px);
+  transition:
+    opacity 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
+    filter 750ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--stagger-step, 90ms) * var(--stagger-i, 0));
+  will-change: opacity, transform, filter;
+}
+
+[data-stagger].reveal-in > *,
+.reveal-in[data-stagger] > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-delayed,
+  .animate-float-slow,
+  .animate-pulse-dot,
+  .animate-marquee,
+  .animate-dash,
+  [data-stagger].reveal-in .reveal-once-ring,
+  [data-stagger].reveal-in .reveal-once-row,
+  [data-stagger].reveal-in .reveal-once-line {
+    animation: none;
+  }
+  .reveal-once-ring { opacity: 1; }
+  .reveal-once-line { stroke-dashoffset: 0; }
+
+  .reveal,
+  [data-stagger] > * {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
 }
